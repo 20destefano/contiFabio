@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Obolo">
+<meta name="theme-color" content="#F4F1E9">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Obolo</title>
+<style>
+:root{
+  /* fondi chiari — Marmo & Alloro */
+  --crema:#F4F1E9;
+  --crema-alta:#FFFFFF;
+  --lavanda:#EAF1EC;
+  --bordo:#E2DDD0;
+  --traccia:#E6EDE7;
+
+  /* inchiostri */
+  --inchiostro:#1F2A24;
+  --inchiostro-lieve:#6E7B72;
+
+  /* accenti — verde salvia + oro. Manteniamo i nomi vecchi, nuovi valori */
+  --rosa:#2F6B4F;          /* accento principale (era il rosa) */
+  --rosa-chiaro:#4C9A73;
+  --rosa-scuro:#255740;
+  --viola:#3F8A66;         /* accento secondario */
+  --viola-chiaro:#6BAE8C;
+  --viola-scuro:#255740;
+  --menta:#2F6B4F;
+  --menta-chiara:#7CC3A0;
+  --oro:#B7935E;
+
+  /* colori leggibili sul chiaro */
+  --entrata:#2F6B4F;
+  --necessita:#3D7D9A;
+  --extra:#B4823C;
+  --rosso:#B23A32;
+
+  /* colori accesi sul pannello scuro (il blocco pieno) */
+  --su-viola:#F4F1E9;
+  --su-viola-lieve:#B9C9BF;
+  --menta-viva:#7CC3A0;
+  --rosso-vivo:#E88A82;
+
+  --display:"Fraunces","Georgia",serif;
+  --corpo:"Inter",system-ui,-apple-system,sans-serif;
+  --cifre:"Spline Sans Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--corpo);color:var(--inchiostro);background-color:var(--crema);
+  background-image:
+    radial-gradient(110% 60% at 100% 0%,rgba(183,147,94,.12),transparent 62%),
+    radial-gradient(120% 70% at 0% 8%,rgba(47,107,79,.10),transparent 60%);
+  background-attachment:fixed;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;
+}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--viola);outline-offset:2px}
+
+.testata{
+  position:sticky;top:0;z-index:20;padding:calc(env(safe-area-inset-top) + 14px) 20px 12px;
+  background:linear-gradient(var(--crema) 72%,rgba(255,253,246,0));
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+}
+.marchio{font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+.marchio-logo{width:34px;height:34px;border-radius:50%;object-fit:cover;display:block}
+.bottone-dati{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--viola-scuro);border-bottom:1px solid var(--bordo);padding-bottom:2px}
+main{padding:0 20px calc(env(safe-area-inset-bottom) + 100px);max-width:560px;margin:0 auto}
+.vista{display:none}
+.vista.attiva{display:block;animation:sali .28s ease}
+@keyframes sali{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.barra-tab{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;gap:6px;
+  padding:8px 16px calc(env(safe-area-inset-bottom) + 8px);
+  background:rgba(255,253,246,.93);backdrop-filter:saturate(150%) blur(14px);
+  -webkit-backdrop-filter:saturate(150%) blur(14px);border-top:1px solid var(--bordo);
+}
+.tab{flex:1;max-width:170px;padding:9px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--corpo);font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--inchiostro-lieve);border-top:2px solid transparent;margin-top:-9px}
+.tab-ico{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tab.attivo{color:var(--inchiostro);border-top-color:var(--rosa)}
+
+.occhiello{font-family:var(--display);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--viola-scuro);margin:26px 0 10px}
+.scheda{background:var(--crema-alta);border:1px solid var(--bordo);border-radius:14px;padding:16px}
+
+/* ---------- registra ---------- */
+.campo-importo{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--rosa);padding:6px 2px 10px;margin-bottom:4px}
+.campo-importo span{font-family:var(--display);font-size:30px;color:var(--rosa-scuro)}
+.campo-importo input{flex:1;min-width:0;border:0;background:none;outline:none;font-family:var(--cifre);font-size:42px;font-weight:600;letter-spacing:-.02em;text-align:right;padding:0;color:var(--inchiostro)}
+.campo-importo input::placeholder{color:#C9C3B4}
+.segmenti{display:flex;border:1px solid var(--bordo);border-radius:999px;overflow:hidden;margin:18px 0 4px;background:var(--lavanda)}
+.segmento{flex:1;padding:11px 4px;text-align:center;font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--inchiostro-lieve);transition:background .15s,color .15s}
+.segmento.scelto{color:#1F2A24;font-weight:600}
+.segmento[data-tipo="entrata"].scelto{background:var(--menta-chiara)}
+.segmento[data-tipo="necessita"].scelto{background:var(--viola-chiaro)}
+.segmento[data-tipo="extra"].scelto{background:var(--rosa)}
+.pastiglie{display:flex;flex-wrap:wrap;gap:7px}
+.pastiglia{padding:8px 13px;border:1px solid var(--bordo);border-radius:999px;background:var(--crema-alta);font-size:14px;line-height:1.1;color:var(--inchiostro);transition:.15s}
+.pastiglia.scelta{background:var(--rosa);color:#1F2A24;border-color:var(--rosa);font-weight:600}
+.riga-campi{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.campo label{display:block;font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--inchiostro-lieve);margin-bottom:5px}
+.campo input,.campo textarea{width:100%;padding:11px 12px;background:var(--crema-alta);border:1px solid var(--bordo);border-radius:10px;outline:none;font-size:16px;color:var(--inchiostro)}
+.campo input:focus,.campo textarea:focus{border-color:var(--viola)}
+.campo input::placeholder,.campo textarea::placeholder{color:#A9B0A2}
+.campo textarea{resize:vertical;min-height:64px}
+.azioni{display:flex;gap:10px;margin:22px 0 8px}
+.salva{flex:1;padding:15px;background:var(--rosa);color:#1F2A24;border-radius:999px;font-family:var(--display);font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;box-shadow:0 8px 18px -10px rgba(47,107,79,.55)}
+.salva:disabled{opacity:.32;box-shadow:none}
+.elimina{padding:15px 18px;border:1px solid var(--rosso);color:var(--rosso);border-radius:999px;font-family:var(--display);font-size:15px;letter-spacing:.12em;text-transform:uppercase}
+.nota-modifica{display:none;margin-bottom:14px;padding:9px 12px;border-left:3px solid var(--rosa);background:var(--lavanda);border-radius:0 8px 8px 0;font-size:14px}
+.nota-modifica.visibile{display:block}
+
+/* ---------- periodo ---------- */
+.periodo{display:flex;align-items:center;justify-content:space-between;margin:8px 0 18px}
+.periodo h2{flex:1;text-align:center;margin:0 6px;font-family:var(--display);font-weight:600;font-size:23px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.freccia{width:42px;height:42px;border:1px solid var(--bordo);border-radius:50%;background:var(--crema-alta);font-size:17px;line-height:1;color:var(--viola-scuro)}
+
+/* ---------- pannello viola (i numeri che contano) ---------- */
+.notte{
+  background:linear-gradient(150deg,#3F8A66 0%,#1F3D2E 100%);
+  color:var(--su-viola);border-radius:18px;padding:18px 18px 20px;
+  box-shadow:0 16px 30px -20px rgba(31,42,36,.7);
+}
+.notte-testa{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+.notte-testa span{font-family:var(--display);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--su-viola-lieve)}
+.notte-cifra{font-family:var(--cifre);font-size:15px;font-weight:600;letter-spacing:-.03em}
+
+.misuratore-barra{position:relative;display:flex;height:32px;width:100%;border-radius:9px;overflow:hidden;background:rgba(255,253,246,.20)}
+.fetta{height:100%;transition:width .45s ease}
+.fetta.necessita{background:linear-gradient(180deg,#B9C9BF,#5FA3C0)}
+.fetta.extra{background:linear-gradient(180deg,var(--rosa-chiaro),var(--rosa))}
+.fetta.risparmio{background-image:repeating-linear-gradient(45deg,var(--menta-viva) 0 2px,transparent 2px 8px)}
+.fetta.rosso{background:var(--rosso-vivo)}
+.tacca{position:absolute;top:0;bottom:0;width:2px;background:var(--su-viola)}
+
+.voci-notte{margin-top:16px;display:flex;flex-direction:column;gap:11px}
+.voce-notte{display:flex;align-items:center;gap:10px;font-size:14px}
+.voce-notte i{width:11px;height:11px;border-radius:3px;flex:none}
+.voce-notte span{flex:1;color:var(--su-viola-lieve)}
+.voce-notte b{font-family:var(--cifre);font-size:14.5px;font-weight:600;letter-spacing:-.03em}
+.voce-notte em{font-style:normal;font-family:var(--cifre);font-size:12px;color:var(--su-viola-lieve);width:44px;text-align:right}
+.riga-confronto{margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,253,246,.24);font-size:13px;color:var(--su-viola-lieve);line-height:1.5}
+.riga-confronto b{color:var(--su-viola);font-family:var(--cifre);font-weight:600}
+.su{color:#E8B4B0}
+.giu{color:var(--menta-viva)}
+
+/* ---------- sintesi ---------- */
+.sintesi{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bordo);border:1px solid var(--bordo);border-radius:14px;overflow:hidden;margin-top:16px}
+.cella{background:var(--crema-alta);padding:13px 10px}
+.cella span{display:block;font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--inchiostro-lieve);margin-bottom:4px}
+.cella b{font-family:var(--cifre);font-size:15px;font-weight:600;letter-spacing:-.045em;white-space:nowrap}
+.positivo{color:var(--entrata)}
+.negativo{color:var(--rosso)}
+
+/* ---------- categorie ---------- */
+.voce-cat{margin-bottom:13px}
+.voce-cat-testa{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px;font-size:14px}
+.voce-cat-testa b{font-family:var(--cifre);font-weight:600;font-size:14px;white-space:nowrap}
+.voce-cat-testa b small{font-family:var(--corpo);font-size:12px;font-weight:400;color:var(--inchiostro-lieve);margin-left:7px}
+.traccia{height:8px;background:var(--traccia);border-radius:4px;overflow:hidden}
+.traccia div{height:100%;border-radius:4px}
+
+/* ---------- registro ---------- */
+.giorno{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--inchiostro-lieve);margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--bordo)}
+.riga{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 2px;border-bottom:1px solid rgba(230,218,247,.85);color:var(--inchiostro)}
+.riga:active{background:var(--lavanda)}
+.pallino{width:9px;height:9px;border-radius:50%;flex:none}
+.riga-testo{flex:1;min-width:0}
+.riga-testo strong{display:block;font-weight:500;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.riga-testo em{font-style:normal;font-size:12.5px;color:var(--inchiostro-lieve)}
+.riga-cifra{font-family:var(--cifre);font-size:15px;font-weight:600;white-space:nowrap}
+
+/* ---------- anno ---------- */
+.proiezione-cifra{font-family:var(--cifre);font-size:36px;font-weight:600;letter-spacing:-.04em;margin:2px 0 4px;display:block}
+.proiezione-nota{margin:8px 0 0;font-size:13px;line-height:1.55;color:var(--su-viola-lieve)}
+.interruttore{display:flex;border:1px solid rgba(255,253,246,.36);border-radius:999px;overflow:hidden;margin-top:16px}
+.interruttore button{flex:1;padding:9px 6px;font-family:var(--display);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--su-viola-lieve)}
+.interruttore button.scelto{background:var(--su-viola);color:#2F6B4F;font-weight:600}
+.interruttore button:disabled{opacity:.4}
+.mesi-etichette{display:grid;grid-template-columns:repeat(12,1fr);margin-top:6px}
+.mesi-etichette span{font-family:var(--display);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;text-align:center;color:var(--inchiostro-lieve)}
+table.conti{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+table.conti th{font-family:var(--display);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--inchiostro-lieve);font-weight:600;text-align:right;padding:0 0 8px}
+table.conti th:first-child{text-align:left}
+table.conti td{font-family:var(--cifre);font-size:13px;letter-spacing:-.04em;text-align:right;padding:7px 0;border-top:1px solid var(--bordo);white-space:nowrap}
+table.conti td:first-child{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-align:left}
+tr.stima td{color:var(--inchiostro-lieve);font-style:italic}
+tr.corrente td{background:rgba(183,147,94,.12)}
+tr.totale td{border-top:2px solid var(--rosa);font-weight:600;padding-top:9px}
+.legenda-riga{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12.5px;color:var(--inchiostro-lieve)}
+.legenda-riga i{display:inline-block;width:11px;height:11px;margin-right:6px;border-radius:3px;vertical-align:-1px}
+.bottone-csv{display:block;width:100%;margin-top:26px;padding:15px;border:1.5px solid var(--viola);color:var(--viola-scuro);border-radius:999px;font-family:var(--display);font-size:14px;letter-spacing:.16em;text-transform:uppercase;background:var(--crema-alta)}
+.bottone-csv:active{background:var(--viola);color:var(--crema)}
+
+.vuoto{padding:34px 6px;color:var(--inchiostro-lieve);font-size:15px;line-height:1.6;border-top:1px solid var(--bordo)}
+
+/* ---------- pannello dati ---------- */
+.velo{position:fixed;inset:0;z-index:40;background:rgba(43,27,77,.35);display:none}
+.velo.aperto{display:block}
+.pannello{position:fixed;left:0;right:0;bottom:0;z-index:41;transform:translateY(101%);transition:transform .3s ease;background:var(--crema);border-top:1px solid var(--bordo);border-radius:22px 22px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom) + 22px);max-width:560px;margin:0 auto;box-shadow:0 -12px 34px -22px rgba(43,27,77,.7)}
+.pannello.aperto{transform:none}
+.pannello h3{margin:0 0 4px;font-family:var(--display);font-size:20px;letter-spacing:.12em;text-transform:uppercase}
+.pannello p{margin:0 0 18px;font-size:13.5px;line-height:1.5;color:var(--inchiostro-lieve)}
+.voce-dati{display:block;width:100%;text-align:left;padding:14px 2px;border-bottom:1px solid var(--bordo);font-size:16px;color:var(--inchiostro)}
+.voce-dati small{display:block;font-size:13px;color:var(--inchiostro-lieve);margin-top:2px}
+.pericolo{color:var(--rosso)}
+.chiudi{margin-top:18px;width:100%;padding:14px;border:1px solid var(--bordo);border-radius:999px;font-family:var(--display);letter-spacing:.14em;text-transform:uppercase;font-size:14px;color:var(--inchiostro-lieve)}
+
+.brindisi{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 88px);transform:translate(-50%,14px);z-index:50;background:var(--inchiostro);color:var(--crema);font-weight:600;padding:11px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 24px -14px rgba(43,27,77,.9)}
+.brindisi.visibile{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- budget: limiti in euro ---------- */
+.riga-lim{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bordo)}
+.riga-lim.ultima{border-bottom:0}
+.lim-nome{flex:1;min-width:0;font-size:14.5px;display:flex;align-items:center;gap:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lim-nome i{width:10px;height:10px;border-radius:3px;flex:none}
+.lim-pct{font-family:var(--cifre);font-size:12.5px;color:var(--inchiostro-lieve);width:42px;text-align:right;flex:none}
+.lim-campo{display:flex;align-items:center;gap:4px;flex:none;background:var(--lavanda);border:1px solid var(--bordo);border-radius:9px;padding:6px 10px}
+.lim-campo:focus-within{border-color:var(--viola)}
+.lim-campo b{font-family:var(--cifre);font-size:14px;color:var(--inchiostro-lieve);font-weight:600}
+.lim-campo input{width:64px;border:0;background:none;outline:none;text-align:right;font-family:var(--cifre);font-size:16px;font-weight:600;color:var(--inchiostro);padding:0}
+
+/* ---------- spese annuali ---------- */
+.annuale-riga{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--bordo)}
+.annuale-info{flex:1;min-width:0}
+.annuale-info strong{display:block;font-weight:500;font-size:15px}
+.annuale-info em{font-style:normal;font-size:12.5px;color:var(--inchiostro-lieve)}
+.annuale-imp{font-family:var(--cifre);font-size:15px;font-weight:600;color:var(--rosso);white-space:nowrap}
+.annuale-x{font-size:20px;color:var(--inchiostro-lieve);padding:2px 6px;flex:none;line-height:1}
+.form-annuale{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.form-annuale .riga2{display:flex;gap:10px}
+.form-annuale input,.form-annuale select{padding:11px 12px;background:var(--crema-alta);border:1px solid var(--bordo);border-radius:10px;outline:none;font-size:16px;color:var(--inchiostro);width:100%}
+.form-annuale input:focus,.form-annuale select:focus{border-color:var(--viola)}
+.form-annuale .riga2 .imp{flex:1}
+.form-annuale .riga2 .mese{flex:1}
+
+/* ---------- tracker risparmio (pagina Anno) ---------- */
+.tracker-griglia{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bordo);border:1px solid var(--bordo);border-radius:14px;overflow:hidden}
+.tracker-cella{background:var(--crema-alta);padding:14px 14px 12px}
+.tracker-cella.forte{background:var(--lavanda)}
+.tracker-et{display:block;font-family:var(--display);font-size:12px;letter-spacing:.02em;color:var(--inchiostro);margin-bottom:3px}
+.tracker-num{font-family:var(--cifre);font-size:21px;font-weight:600;letter-spacing:-.03em;display:block;line-height:1.1}
+.tracker-sotto{font-style:normal;font-size:11px;color:var(--inchiostro-lieve);display:block;margin-top:3px}
+.tracker-corso{margin:12px 2px 0;font-size:12.5px;line-height:1.45;color:var(--inchiostro-lieve);display:flex;align-items:baseline;gap:7px}
+.tracker-corso b{font-family:var(--cifre);font-weight:600}
+.tracker-punto{width:7px;height:7px;border-radius:50%;background:var(--oro);flex:none;position:relative;top:1px}
+
+/* ---------- kpi risparmio cumulato ---------- */
+.kpi-cumulato{
+  display:flex;align-items:center;gap:16px;margin-bottom:6px;padding:20px 20px 22px;
+  background:linear-gradient(145deg,#DDEDE2 0%,#EAF1EC 55%,#FDEBF6 100%);
+  border:1px solid #C7D8CC;border-radius:20px;
+  box-shadow:0 14px 30px -22px rgba(11,138,102,.5);
+}
+.kpi-cumulato:has(+ .kpi-scala){border-radius:20px 20px 0 0;margin-bottom:0;padding-bottom:16px}
+.kpi-cumulato.kpi-rosso{
+  background:linear-gradient(145deg,#EDEAE0 0%,#F1EEE6 100%);border-color:var(--bordo);
+}
+.kpi-pianta{
+  flex:none;width:100px;height:92px;display:flex;align-items:flex-end;justify-content:center;
+  background:radial-gradient(58% 46% at 50% 82%,rgba(62,212,164,.24),transparent 72%);
+}
+.kpi-pianta svg{filter:drop-shadow(0 4px 6px rgba(11,138,102,.18))}
+.kpi-testo{flex:1;min-width:0}
+.kpi-occhiello{font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#2F6B4F}
+.kpi-rosso .kpi-occhiello{color:var(--inchiostro-lieve)}
+.kpi-cifra{display:block;font-family:var(--cifre);font-size:38px;font-weight:600;letter-spacing:-.04em;color:#255740;margin:3px 0 6px;line-height:1}
+.kpi-rosso .kpi-cifra{color:var(--rosso)}
+.kpi-frase{margin:0;font-size:13px;line-height:1.45;color:#1F2A24}
+.kpi-livello{margin-top:3px;display:flex;flex-direction:column;line-height:1.2}
+.kpi-livello b{font-family:var(--display);font-size:21px;letter-spacing:.04em;color:#255740;font-weight:600}
+.kpi-rosso .kpi-livello b{color:var(--inchiostro)}
+
+.kpi-scala{margin:0 0 10px;padding:4px 18px 16px;background:var(--crema-alta);border:1px solid #D3E0D6;border-top:0;border-radius:0 0 18px 18px;position:relative}
+.kpi-scala-testa{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.kpi-scala-testa > span:first-child{font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--inchiostro-lieve)}
+.kpi-manca{font-family:var(--cifre);font-size:12.5px;font-weight:600;color:#2F6B4F;text-align:right}
+.kpi-barra{height:11px;background:#E6EDE7;border-radius:6px;overflow:hidden;border:1px solid #D3E0D6}
+.kpi-barra-riempi{height:100%;border-radius:6px;background:linear-gradient(90deg,#4C9A73,#2F6B4F);transition:width .5s ease}
+.kpi-scala .kpi-frase{margin-top:9px;color:var(--inchiostro-lieve)}
+.kpi-corso{margin-top:10px;padding-top:10px;border-top:1px dashed #D3E0D6;font-size:12.5px;line-height:1.45;color:var(--inchiostro-lieve);display:flex;align-items:baseline;gap:7px}
+.kpi-corso b{font-family:var(--cifre);font-weight:600}
+.kpi-corso-punto{width:7px;height:7px;border-radius:50%;background:#B4823C;flex:none;position:relative;top:1px;animation:pulsa 2s ease-in-out infinite}
+@keyframes pulsa{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ---------- budget: note sforo ---------- */
+.cat-nota{font-size:12px;margin-top:5px;font-weight:600}
+.cat-nota.sforato{color:var(--rosso)}
+.cat-nota.quasi{color:#8A6224}
+
+/* ---------- pop-up modale ---------- */
+.modale-velo{
+  position:fixed;inset:0;z-index:60;background:rgba(43,27,77,.5);
+  display:flex;align-items:center;justify-content:center;padding:32px;
+  animation:appari .2s ease;
+}
+@keyframes appari{from{opacity:0}to{opacity:1}}
+.modale-carta{
+  background:var(--crema-alta);border-radius:22px;padding:28px 24px 22px;max-width:340px;width:100%;
+  text-align:center;box-shadow:0 24px 50px -20px rgba(43,27,77,.6);animation:saliModale .28s ease;
+  border-top:5px solid var(--rosa);
+}
+.modale-carta.modale-sforato{border-top-color:var(--rosso)}
+.modale-carta.modale-quasi{border-top-color:#B4823C}
+@keyframes saliModale{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.modale-emoji{font-size:42px;line-height:1;margin-bottom:12px}
+.modale-carta p{margin:0 0 20px;font-size:16px;line-height:1.5;color:var(--inchiostro)}
+.modale-ok{
+  width:100%;padding:14px;background:var(--rosa);color:#1F2A24;border-radius:999px;
+  font-family:var(--display);font-size:14px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+}
+
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<header class="testata">
+  <div class="marchio"><img src="icon.png" alt="" class="marchio-logo">Obolo</div>
+  <button class="bottone-dati" id="apriDati">Dati</button>
+</header>
+
+<main>
+  <section class="vista attiva" id="vista-registra">
+    <div class="nota-modifica" id="notaModifica">Stai modificando una voce già registrata.</div>
+    <div class="campo-importo">
+      <span>€</span>
+      <input id="importo" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+    </div>
+    <div class="segmenti" id="segmenti">
+      <button class="segmento" data-tipo="entrata">Entrate</button>
+      <button class="segmento scelto" data-tipo="necessita">Necessità</button>
+      <button class="segmento" data-tipo="extra">Extra</button>
+    </div>
+    <div class="occhiello">Categoria</div>
+    <div class="pastiglie" id="pastiglie"></div>
+    <div class="occhiello">Dettagli</div>
+    <div class="riga-campi">
+      <div class="campo"><label for="titolo">Titolo</label><input id="titolo" type="text" placeholder="es. Spesa settimanale" autocomplete="off"></div>
+      <div class="campo"><label for="data">Data</label><input id="data" type="date"></div>
+      <div class="campo"><label for="note">Note (facoltative)</label><textarea id="note" placeholder="Qualcosa da ricordare su questa voce"></textarea></div>
+    </div>
+    <div class="azioni">
+      <button class="salva" id="salva">Registra</button>
+      <button class="elimina" id="eliminaVoce" style="display:none">Elimina</button>
+    </div>
+  </section>
+
+  <section class="vista" id="vista-mese">
+    <div class="periodo">
+      <button class="freccia" id="mesePrec" aria-label="Mese precedente">‹</button>
+      <h2 id="titoloMese">—</h2>
+      <button class="freccia" id="meseSucc" aria-label="Mese successivo">›</button>
+    </div>
+    <div id="corpoMese"></div>
+  </section>
+
+  <section class="vista" id="vista-budget">
+    <div class="periodo">
+      <button class="freccia" id="budgetPrec" aria-label="Mese precedente">‹</button>
+      <h2 id="titoloBudget">—</h2>
+      <button class="freccia" id="budgetSucc" aria-label="Mese successivo">›</button>
+    </div>
+    <div id="corpoBudget"></div>
+  </section>
+
+  <section class="vista" id="vista-anno">
+    <div class="periodo">
+      <button class="freccia" id="annoPrec" aria-label="Anno precedente">‹</button>
+      <h2 id="titoloAnno">—</h2>
+      <button class="freccia" id="annoSucc" aria-label="Anno successivo">›</button>
+    </div>
+    <div id="corpoAnno"></div>
+  </section>
+</main>
+
+<nav class="barra-tab">
+  <button class="tab attivo" data-vista="registra">
+    <svg viewBox="0 0 24 24" class="tab-ico"><path d="M12 5v14M5 12h14"/></svg>
+    <span>Registra</span>
+  </button>
+  <button class="tab" data-vista="mese">
+    <svg viewBox="0 0 24 24" class="tab-ico"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg>
+    <span>Mese</span>
+  </button>
+  <button class="tab" data-vista="budget">
+    <svg viewBox="0 0 24 24" class="tab-ico"><ellipse cx="11.5" cy="12.5" rx="7.5" ry="5.5"/><path d="M19 11.8c1 0 1.6.6 1.6 1.5s-.7 1.5-1.6 1.5"/><path d="M6 8.3 4.8 5.6 7.7 6.9"/><path d="M9.5 8.2h4"/><path d="M6 17.6V20M10 18v2M13 18v2M17 17.6V20"/><circle cx="8" cy="11.5" r=".7" fill="currentColor" stroke="none"/><path d="M4.3 12.2 2.6 12"/></svg>
+    <span>Budget</span>
+  </button>
+  <button class="tab" data-vista="anno">
+    <svg viewBox="0 0 24 24" class="tab-ico"><path d="M4 20V8M10 20V4M16 20v-8M4 20h16"/></svg>
+    <span>Anno</span>
+  </button>
+</nav>
+
+<div class="velo" id="velo"></div>
+<div class="pannello" id="pannello">
+  <h3>Dati</h3>
+  <p>Le voci restano su questo telefono, legate all'indirizzo del sito. Aggiornare l'app non le tocca. Esporta ogni tanto: è il tuo backup.</p>
+  <button class="voce-dati" id="esporta">Scarica CSV<small id="contaVoci"></small></button>
+  <button class="voce-dati" id="importa">Importa CSV<small>Aggiunge le voci di un file esportato prima</small></button>
+  <button class="voce-dati pericolo" id="azzera">Cancella tutto<small>Non si può annullare</small></button>
+  <input type="file" id="fileCsv" accept=".csv,text/csv" style="display:none">
+  <button class="chiudi" id="chiudiPannello">Chiudi</button>
+</div>
+
+<div class="brindisi" id="brindisi"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. Dati, categorie, deposito
+   ============================================================ */
+const GRUPPI = {
+  entrata:   { nome:"Entrate",   colore:"#2F6B4F", viva:"#4C9A73", voci:["Stipendio","Affitti","Altro"] },
+  necessita: { nome:"Necessità", colore:"#3D7D9A", viva:"#5FA3C0", voci:["Casa","Spesa","Benzina","Sanità","Macchina e Motorino","Tasse"] },
+  extra:     { nome:"Extra",     colore:"#B4823C", viva:"#D6A65C", voci:["Vestiti","Abbonamenti","Cibo fuori","Birre e Drink","Beach","Regali","Viaggi e Vacanze","Lucrezia","Altro Extra"] }
+};
+const MESI = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+const MESI_BREVI = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+
+const CHIAVE = "obolo-v1";
+const CHIAVE_MODO = "obolo-modo-proiezione";
+const CHIAVE_BUDGET = "obolo-budget-v1";
+const CHIAVE_ANNUALI = "obolo-annuali-v1";
+
+/* budget: per ogni mese in cui lo imposti salvo una voce "AAAA-MM" con
+   { limiti: { "necessita|Casa": euro, ... } }. Ogni categoria di necessita
+   ed extra e' impostabile in euro. I mesi senza voce ereditano dall'ultimo
+   mese impostato prima di loro. */
+const CHIAVE_BUDGET_GRUPPI = ["necessita","extra"];
+const Deposito = {
+  async leggi(chiave, difetto){
+    if (window.storage) {
+      try { const r = await window.storage.get(chiave); return r && r.value ? JSON.parse(r.value) : difetto; }
+      catch(e){ return difetto; }
+    }
+    try { const s = localStorage.getItem(chiave); return s ? JSON.parse(s) : difetto; }
+    catch(e){ return difetto; }
+  },
+  async scrivi(chiave, valore){
+    const s = JSON.stringify(valore);
+    if (window.storage) { try { await window.storage.set(chiave, s); return true; } catch(e){} }
+    try { localStorage.setItem(chiave, s); return true; }
+    catch(e){ avvisa("Memoria piena: scarica il CSV"); return false; }
+  }
+};
+
+let voci = [];
+let inModifica = null;
+let modoProiezione = "stagionale";
+let budget = {};                    /* { "2026-01": {limiti:{"necessita|Casa":euro,...}}, ... } */
+let annuali = [];                   /* [{id, anno, nome, importo, mese|null}] spese annuali corpose */
+const oggi = new Date();
+let meseVista = oggi.getMonth();
+let annoVista = oggi.getFullYear();
+let annoVistaAnno = oggi.getFullYear();
+let budgetMese = oggi.getMonth();
+let budgetAnno = oggi.getFullYear();
+let tipoScelto = "necessita";
+let catScelta = null;
+
+/* ============================================================
+   2. Utilità
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const euro = new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2});
+const euroTondo = new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",maximumFractionDigits:0});
+const numTondo = new Intl.NumberFormat("it-IT",{maximumFractionDigits:0});
+const fmt = n => euro.format(n);
+const fmtT = n => euroTondo.format(n);
+const num = n => numTondo.format(n);
+
+function isoOggi(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function pezziData(iso){ const p = String(iso).split("-"); return { anno:+p[0], mese:+p[1]-1, giorno:+p[2] }; }
+function avvisa(testo){
+  const b = $("#brindisi"); b.textContent = testo; b.classList.add("visibile");
+  clearTimeout(avvisa.t); avvisa.t = setTimeout(()=>b.classList.remove("visibile"), 2200);
+}
+function esc(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+const delMese = (v,a,m) => { const p = pezziData(v.data); return p.anno === a && p.mese === m; };
+const delAnno = (v,a) => pezziData(v.data).anno === a;
+const somma = (lista,tipo) => lista.filter(v=>v.tipo===tipo).reduce((t,v)=>t+v.importo,0);
+const perc = (parte,tot) => tot > 0 ? Math.round(parte/tot*100) : 0;
+
+/* riepilogo dei dodici mesi di un anno */
+function mesiDi(anno){
+  const lista = voci.filter(v => delAnno(v, anno));
+  return Array.from({length:12}, (_,m) => {
+    const l = lista.filter(v => pezziData(v.data).mese === m);
+    const e = somma(l,"entrata"), n = somma(l,"necessita"), x = somma(l,"extra");
+    return { entrate:e, nec:n, extra:x, uscite:n+x, saldo:e-n-x, voci:l.length };
+  });
+}
+
+/* ============================================================
+   3. Registra
+   ============================================================ */
+function disegnaPastiglie(){
+  const cont = $("#pastiglie"); cont.innerHTML = "";
+  GRUPPI[tipoScelto].voci.forEach(nome => {
+    const b = document.createElement("button");
+    b.className = "pastiglia" + (nome === catScelta ? " scelta" : "");
+    b.textContent = nome;
+    b.addEventListener("click", () => {
+      catScelta = nome; disegnaPastiglie(); controllaModulo();
+      if (!$("#titolo").value.trim()) $("#titolo").placeholder = "es. " + nome;
+    });
+    cont.appendChild(b);
+  });
+}
+function scegliTipo(tipo){
+  tipoScelto = tipo; catScelta = null;
+  document.querySelectorAll(".segmento").forEach(s => s.classList.toggle("scelto", s.dataset.tipo === tipo));
+  disegnaPastiglie(); controllaModulo();
+}
+function leggiImporto(){
+  const grezzo = $("#importo").value.replace(/\s/g,"").replace(/\./g,"").replace(",",".");
+  const n = parseFloat(grezzo);
+  return isFinite(n) ? Math.abs(n) : 0;
+}
+function controllaModulo(){ $("#salva").disabled = !(leggiImporto() > 0 && catScelta); }
+function azzeraModulo(){
+  inModifica = null;
+  $("#importo").value = ""; $("#titolo").value = ""; $("#note").value = ""; $("#data").value = isoOggi();
+  $("#notaModifica").classList.remove("visibile");
+  $("#eliminaVoce").style.display = "none";
+  $("#salva").textContent = "Registra";
+  scegliTipo("necessita");
+}
+function apriInModifica(id){
+  const v = voci.find(x => x.id === id); if (!v) return;
+  inModifica = id; tipoScelto = v.tipo; catScelta = v.cat;
+  document.querySelectorAll(".segmento").forEach(s => s.classList.toggle("scelto", s.dataset.tipo === v.tipo));
+  disegnaPastiglie();
+  $("#importo").value = v.importo.toFixed(2).replace(".", ",");
+  $("#titolo").value = v.titolo || ""; $("#note").value = v.note || ""; $("#data").value = v.data;
+  $("#notaModifica").classList.add("visibile");
+  $("#eliminaVoce").style.display = "block";
+  $("#salva").textContent = "Aggiorna";
+  controllaModulo(); cambiaVista("registra");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+async function salvaVoce(){
+  const importo = leggiImporto();
+  if (!(importo > 0) || !catScelta) return;
+  const dato = {
+    id: inModifica || (Date.now().toString(36) + Math.random().toString(36).slice(2,7)),
+    data: $("#data").value || isoOggi(),
+    tipo: tipoScelto, cat: catScelta,
+    titolo: $("#titolo").value.trim() || catScelta,
+    note: $("#note").value.trim(),
+    importo: Math.round(importo * 100) / 100
+  };
+  const eraNuova = !inModifica;
+  if (inModifica) {
+    const i = voci.findIndex(v => v.id === inModifica);
+    if (i > -1) voci[i] = dato;
+    avvisa("Voce aggiornata");
+  } else {
+    voci.push(dato);
+    avvisa(GRUPPI[dato.tipo].nome + " · " + fmt(dato.importo));
+  }
+  await Deposito.scrivi(CHIAVE, voci);
+  const p = pezziData(dato.data); meseVista = p.mese; annoVista = p.anno;
+  budgetMese = p.mese; budgetAnno = p.anno;
+  azzeraModulo(); controllaModulo(); disegnaMese(); disegnaAnno();
+
+  /* avviso budget: solo per una spesa nuova, non in modifica */
+  if (eraNuova && (dato.tipo === "necessita" || dato.tipo === "extra")) {
+    const a = controllaSforo(p.anno, p.mese, dato.tipo, dato.cat);
+    if (a) setTimeout(() => popup(a.testo, a.livello), 360);
+  }
+}
+async function eliminaCorrente(){
+  if (!inModifica || !confirm("Eliminare questa voce?")) return;
+  voci = voci.filter(v => v.id !== inModifica);
+  await Deposito.scrivi(CHIAVE, voci);
+  azzeraModulo(); controllaModulo(); disegnaMese(); disegnaAnno();
+  avvisa("Voce eliminata"); cambiaVista("mese");
+}
+
+/* ============================================================
+   3-bis. Budget: modello e calcoli (limiti in euro, per ogni categoria)
+   ============================================================ */
+const chiaveMese = (a,m) => a + "-" + String(m+1).padStart(2,"0");
+
+/* tutte le voci-budget: ogni categoria di necessita ed extra, in ordine */
+function vociBudget(){
+  const out = [];
+  CHIAVE_BUDGET_GRUPPI.forEach(g => {
+    GRUPPI[g].voci.forEach(c => {
+      out.push({ id:g+"|"+c, tipo:g, gruppo:g, cat:c, nome:c, colore:GRUPPI[g].colore, viva:GRUPPI[g].viva });
+    });
+  });
+  return out;
+}
+
+/* il budget valido per un mese: quello impostato, o l'ultimo prima di esso */
+function budgetVigente(a,m){
+  const chiave = chiaveMese(a,m);
+  if (budget[chiave]) return { dato:budget[chiave], ereditato:false, da:chiave };
+  const chiavi = Object.keys(budget).filter(k => k <= chiave).sort();
+  if (!chiavi.length) return null;
+  const ultima = chiavi[chiavi.length-1];
+  return { dato:budget[ultima], ereditato:true, da:ultima };
+}
+
+/* entrate reali del mese; se zero, stima dalla media dei mesi con entrate */
+function entrateMese(a,m){
+  const e = somma(voci.filter(v => delMese(v,a,m)), "entrata");
+  if (e > 0) return { valore:e, stimata:false };
+  const conEntrate = {};
+  voci.filter(v => v.tipo === "entrata").forEach(v => {
+    const p = pezziData(v.data); const k = p.anno+"-"+p.mese;
+    conEntrate[k] = (conEntrate[k]||0) + v.importo;
+  });
+  const vals = Object.values(conEntrate);
+  if (!vals.length) return { valore:0, stimata:false };
+  return { valore: vals.reduce((t,x)=>t+x,0)/vals.length, stimata:true };
+}
+
+/* speso nel mese per una categoria precisa */
+function spesoVoce(a,m,vb){
+  return voci.filter(v => delMese(v,a,m) && v.tipo === vb.gruppo && v.cat === vb.cat)
+             .reduce((t,v)=>t+v.importo,0);
+}
+
+/* quadro completo del budget di un mese, pronto da disegnare */
+function quadroBudget(a,m){
+  const vig = budgetVigente(a,m);
+  const limiti = vig ? (vig.dato.limiti || {}) : {};
+  const ent = entrateMese(a,m);
+
+  const righe = vociBudget().map(vb => {
+    const limite = limiti[vb.id] || 0;
+    const speso = spesoVoce(a,m,vb);
+    return { ...vb, limite, speso, resto:limite - speso,
+             stato: limite <= 0 ? "vuoto" : speso > limite ? "sforato" : speso >= limite*0.8 ? "quasi" : "ok" };
+  });
+
+  const limiteTot = righe.reduce((t,r) => t + r.limite, 0);
+  const spesoTot = righe.reduce((t,r) => t + r.speso, 0);
+  /* percentuale di ogni riga sul totale del budget (per il "di fianco") */
+  righe.forEach(r => { r.pct = limiteTot > 0 ? Math.round(r.limite / limiteTot * 100) : 0; });
+
+  return { ent, righe, limiti, limiteTot, spesoTot,
+           risparmioAtteso: ent.valore - limiteTot,
+           esiste: !!vig, ereditato: vig ? vig.ereditato : false, da: vig ? vig.da : null };
+}
+
+/* controllo sforo/soglia dopo aver salvato una spesa: restituisce l'avviso da mostrare */
+function controllaSforo(a, m, tipo, cat){
+  if (!CHIAVE_BUDGET_GRUPPI.includes(tipo)) return null;
+  const q = quadroBudget(a,m);
+  if (!q.esiste) return null;
+  const r = q.righe.find(x => x.id === tipo+"|"+cat);
+  if (!r || r.limite <= 0) return null;
+  if (r.speso > r.limite)
+    return { livello:"sforato", testo:"Finito il budget per la categoria \u201c" + cat + "\u201d" };
+  if (r.speso >= r.limite * 0.8)
+    return { livello:"quasi", testo:"Quasi finito il budget per \u201c" + cat + "\u201d: usato l'" + Math.round(r.speso/r.limite*100) + "%" };
+  return null;
+}
+
+/* ============================================================
+   3-ter. Spese annuali corpose (IRPEF, cassa previdenziale...)
+   ============================================================ */
+function annualiDi(anno){ return annuali.filter(x => x.anno === anno); }
+function totaleAnnuali(anno){ return annualiDi(anno).reduce((t,x)=>t+x.importo,0); }
+
+/* ============================================================
+   4. Mese
+   ============================================================ */
+function disegnaMese(){
+  $("#titoloMese").textContent = MESI[meseVista] + " " + annoVista;
+  const lista = voci.filter(v => delMese(v, annoVista, meseVista));
+  const cont = $("#corpoMese");
+  if (!lista.length) {
+    cont.innerHTML = '<div class="vuoto">Nessuna voce in questo mese.<br>Apri <b>Registra</b> e segna la prima spesa.</div>';
+    return;
+  }
+
+  const entrate = somma(lista,"entrata"), nec = somma(lista,"necessita"), ext = somma(lista,"extra");
+  const uscite = nec + ext, saldo = entrate - uscite;
+  const scala = Math.max(entrate, uscite, 1);
+
+  let html = '<div class="notte">';
+  const inCorso = meseInCorso(annoVista, meseVista);
+  html += '<div class="notte-testa"><span>Risparmio del mese' + (inCorso ? " · provvisorio" : "") + '</span><span class="notte-cifra ' + (saldo>=0?"":"negativo") + '" style="color:' + (saldo>=0?"var(--menta-viva)":"var(--rosso-vivo)") + '">' + fmtT(saldo) + '</span></div>';
+  html += '<div class="misuratore-barra">';
+  html += '<div class="fetta necessita" style="width:' + (nec/scala*100) + '%"></div>';
+  html += '<div class="fetta extra" style="width:' + (ext/scala*100) + '%"></div>';
+  if (saldo > 0) html += '<div class="fetta risparmio" style="width:' + (saldo/scala*100) + '%"></div>';
+  if (entrate > 0 && uscite > entrate) html += '<div class="tacca" style="left:' + (entrate/scala*100) + '%"></div>';
+  html += '</div>';
+
+  html += '<div class="voci-notte">';
+  html += voceNotte("#B9C9BF","Necessità",nec,perc(nec,uscite));
+  html += voceNotte("#4C9A73","Extra",ext,perc(ext,uscite));
+  html += voceNotte("var(--menta-viva)","Entrate",entrate,null);
+  html += '</div>';
+
+  /* confronto con lo stesso mese dell'anno prima */
+  const listaPrima = voci.filter(v => delMese(v, annoVista-1, meseVista));
+  if (listaPrima.length) {
+    const usPrima = somma(listaPrima,"necessita") + somma(listaPrima,"extra");
+    if (usPrima > 0) {
+      const d = (uscite - usPrima) / usPrima * 100;
+      const verso = d >= 0 ? "su" : "giu";
+      const segno = d >= 0 ? "+" : "−";
+      html += '<div class="riga-confronto">Nel ' + MESI[meseVista].toLowerCase() + ' ' + (annoVista-1) +
+              ' avevi speso <b>' + fmtT(usPrima) + '</b> · <span class="' + verso + '">' + segno + Math.abs(Math.round(d)) + '%</span></div>';
+    }
+  }
+  html += '</div>';
+
+  html += '<div class="sintesi">';
+  html += '<div class="cella"><span>Entrate</span><b class="positivo">' + fmtT(entrate) + '</b></div>';
+  html += '<div class="cella"><span>Uscite</span><b>' + fmtT(uscite) + '</b></div>';
+  html += '<div class="cella"><span>Saldo</span><b class="' + (saldo>=0?"positivo":"negativo") + '">' + fmtT(saldo) + '</b></div>';
+  html += '</div>';
+
+  if (uscite > 0) {
+    const perCat = {};
+    lista.filter(v => v.tipo !== "entrata").forEach(v => {
+      const k = v.tipo + "|" + v.cat;
+      perCat[k] = (perCat[k] || 0) + v.importo;
+    });
+    const ordinate = Object.entries(perCat).sort((a,b) => b[1] - a[1]);
+    const massimo = ordinate[0][1];
+    html += '<div class="occhiello">Categorie del mese</div>';
+    ordinate.forEach(([k, tot]) => {
+      const [tipo, cat] = k.split("|");
+      html += '<div class="voce-cat"><div class="voce-cat-testa"><span>' + esc(cat) + '</span>' +
+              '<b>' + fmt(tot) + '<small>' + perc(tot,uscite) + '%</small></b></div>' +
+              '<div class="traccia"><div style="width:' + (tot/massimo*100) + '%;background:linear-gradient(90deg,' +
+              GRUPPI[tipo].viva + ',' + GRUPPI[tipo].colore + ')"></div></div></div>';
+    });
+  }
+
+  html += '<div class="occhiello">Registro</div>';
+  const perGiorno = {};
+  lista.forEach(v => { (perGiorno[v.data] = perGiorno[v.data] || []).push(v); });
+  Object.keys(perGiorno).sort().reverse().forEach(data => {
+    const p = pezziData(data);
+    html += '<div class="giorno">' + p.giorno + " " + MESI_BREVI[p.mese] + '</div>';
+    perGiorno[data].forEach(v => {
+      const segno = v.tipo === "entrata" ? "+" : "−";
+      html += '<button class="riga" data-id="' + v.id + '">' +
+        '<span class="pallino" style="background:' + GRUPPI[v.tipo].colore + '"></span>' +
+        '<span class="riga-testo"><strong>' + esc(v.titolo) + '</strong><em>' + esc(v.cat) + (v.note ? " · " + esc(v.note) : "") + '</em></span>' +
+        '<span class="riga-cifra" style="color:' + (v.tipo === "entrata" ? "var(--entrata)" : "inherit") + '">' + segno + " " + fmt(v.importo) + '</span></button>';
+    });
+  });
+
+  cont.innerHTML = html;
+  cont.querySelectorAll(".riga").forEach(r => r.addEventListener("click", () => apriInModifica(r.dataset.id)));
+}
+function voceNotte(colore, nome, valore, percentuale){
+  return '<div class="voce-notte"><i style="background:' + colore + '"></i><span>' + nome + '</span>' +
+         '<b>' + fmt(valore) + '</b><em>' + (percentuale === null ? "" : percentuale + "%") + '</em></div>';
+}
+
+/* ============================================================
+   5. Proiezione
+   ============================================================ */
+/* distribuzione mensile di un anno: quanta parte del totale cade in ogni mese */
+function distribuzione(anno){
+  const m = mesiDi(anno);
+  const attivi = m.filter(x => x.voci > 0).length;
+  const totU = m.reduce((t,x) => t + x.uscite, 0);
+  const totE = m.reduce((t,x) => t + x.entrate, 0);
+  if (attivi < 6 || totU <= 0) return null;
+  return {
+    uscite:  m.map(x => x.uscite / totU),
+    entrate: totE > 0 ? m.map(x => x.entrate / totE) : Array(12).fill(1/12),
+    attivi: attivi
+  };
+}
+
+function calcolaProiezione(anno){
+  const mesi = mesiDi(anno);
+  const inCorso = anno === oggi.getFullYear();
+  const meseCorr = inCorso ? oggi.getMonth() : -1;
+  const ultimoReale = inCorso ? meseCorr : 11;
+  const ultimoCompleto = inCorso ? meseCorr - 1 : 11;
+  const giorniMese = inCorso ? new Date(anno, meseCorr + 1, 0).getDate() : 30;
+  const frazione = inCorso ? oggi.getDate() / giorniMese : 1;
+
+  const primo = mesi.findIndex(m => m.voci > 0);
+  if (primo < 0 || primo > ultimoReale) return null;
+
+  const dist = distribuzione(anno - 1);
+  const stagionale = modoProiezione === "stagionale" && dist !== null;
+  const pU = stagionale ? dist.uscite  : Array(12).fill(1/12);
+  const pE = stagionale ? dist.entrate : Array(12).fill(1/12);
+
+  /* il ritmo si misura sui mesi chiusi: un affitto pagato il 3 non deve
+     far sembrare che il mese sia gia sforato */
+  let copU = 0, copE = 0, chiusiU = 0, chiusiE = 0;
+  for (let m = primo; m <= ultimoCompleto; m++) {
+    copU += pU[m]; copE += pE[m];
+    chiusiU += mesi[m].uscite; chiusiE += mesi[m].entrate;
+  }
+  let ritmoU, ritmoE;
+  if (copU > 0) { ritmoU = chiusiU / copU; ritmoE = chiusiE / copE; }
+  else {
+    /* primo mese di utilizzo: si usa il mese in corso in proporzione ai giorni */
+    const qU = pU[meseCorr] * frazione, qE = pE[meseCorr] * frazione;
+    ritmoU = qU > 0 ? mesi[meseCorr].uscite / qU : 0;
+    ritmoE = qE > 0 ? mesi[meseCorr].entrate / qE : 0;
+  }
+
+  const righe = mesi.map((m, i) => {
+    const reale = i >= primo && i <= ultimoCompleto;
+    const parziale = inCorso && i === meseCorr;
+    let entrate, uscite;
+    if (reale) { entrate = m.entrate; uscite = m.uscite; }
+    else if (parziale) {
+      entrate = Math.max(m.entrate, ritmoE * pE[i]);
+      uscite  = Math.max(m.uscite,  ritmoU * pU[i]);
+    } else { entrate = ritmoE * pE[i]; uscite = ritmoU * pU[i]; }
+    return { mese:i, entrate, uscite, saldo:entrate - uscite, reale, parziale,
+             nec:m.nec, extraSp:m.extra, voci:m.voci };
+  });
+
+  const notoU = mesi.slice(primo, ultimoReale + 1).reduce((t,m) => t + m.uscite, 0);
+  const notoE = mesi.slice(primo, ultimoReale + 1).reduce((t,m) => t + m.entrate, 0);
+  const entrateAnno = righe.reduce((t,r) => t + r.entrate, 0);
+  const usciteAnno  = righe.reduce((t,r) => t + r.uscite, 0);
+
+  return {
+    mesi, righe, primo, ultimoReale, frazione, stagionale, distDisponibile: dist !== null,
+    notoU, notoE, notoSaldo: notoE - notoU,
+    entrateAnno, usciteAnno, risparmioAnno: entrateAnno - usciteAnno,
+    tasso: entrateAnno > 0 ? (entrateAnno - usciteAnno) / entrateAnno * 100 : 0,
+    mediaMese: (entrateAnno - usciteAnno) / 12
+  };
+}
+
+/* ============================================================
+   6. Anno
+   ============================================================ */
+/* mese/anno correnti, per distinguere i mesi conclusi da quello in corso */
+function meseInCorso(a,m){ return a === oggi.getFullYear() && m === oggi.getMonth(); }
+function meseNelFuturo(a,m){ return a > oggi.getFullYear() || (a === oggi.getFullYear() && m > oggi.getMonth()); }
+
+/* risparmio consolidato: somma solo dei mesi CONCLUSI (entrate - uscite).
+   Il mese in corso non entra: si consolida a fine mese, quando l'effettivo
+   e' chiuso. Cosi il cumulato non sobbalza quando arriva lo stipendio. */
+function risparmioCumulato(){
+  let tot = 0;
+  const perMese = {};
+  voci.forEach(v => {
+    const p = pezziData(v.data);
+    if (meseInCorso(p.anno, p.mese) || meseNelFuturo(p.anno, p.mese)) return;
+    const k = p.anno + "-" + p.mese;
+    perMese[k] = (perMese[k] || 0) + (v.tipo === "entrata" ? v.importo : -v.importo);
+  });
+  Object.values(perMese).forEach(x => tot += x);
+  return tot;
+}
+
+/* saldo provvisorio del mese in corso (entrate - uscite finora) */
+function risparmioInCorso(){
+  const a = oggi.getFullYear(), m = oggi.getMonth();
+  const lista = voci.filter(v => delMese(v,a,m));
+  return somma(lista,"entrata") - somma(lista,"necessita") - somma(lista,"extra");
+}
+
+/* scala dei livelli: soglia in euro, nome, sottotitolo, stadio della pianta (0-5).
+   I valori sono facili da ritoccare. */
+const LIVELLI = [
+  { soglia: 0,     nome: "Luisa",             stadio: 0 },
+  { soglia: 3000,  nome: "Gigi",              stadio: 1 },
+  { soglia: 5000,  nome: "JP",                stadio: 2 },
+  { soglia: 8000,  nome: "Drino",             stadio: 2 },
+  { soglia: 13000, nome: "Cate Cerminara",    stadio: 3 },
+  { soglia: 18000, nome: "la prof",           stadio: 4 },
+  { soglia: 30000, nome: "Silvio Berlusconi", stadio: 5 }
+];
+
+/* livello attuale e progresso verso il prossimo, dato il cumulato */
+function livelloDa(valore){
+  let i = 0;
+  for (let k = 0; k < LIVELLI.length; k++) if (valore >= LIVELLI[k].soglia) i = k;
+  const attuale = LIVELLI[i];
+  const prossimo = LIVELLI[i + 1] || null;
+  let progresso = 1, manca = 0;
+  if (prossimo) {
+    const base = attuale.soglia;
+    progresso = Math.max(0, Math.min(1, (valore - base) / (prossimo.soglia - base)));
+    manca = prossimo.soglia - valore;
+  }
+  return { indice: i, attuale, prossimo, progresso, manca };
+}
+
+function svgPianta(stadio){
+  const V = '<ellipse cx="60" cy="110" rx="22" ry="6" fill="rgba(11,138,102,.10)"/>' +
+    '<path d="M44 84 L76 84 L72 106 Q60 111 48 106 Z" fill="#F0A8D4"/>' +
+    '<rect x="42" y="79" width="36" height="9" rx="4" fill="#FFF3FB"/>';
+  let pianta = "";
+  const T = "#4C9A73", TS = "#2F6B4F", F = "#FF7BC8", FC = "#FFB3E0";
+  if (stadio === 0) {
+    pianta = '<path d="M60 80 Q57 66 60 54" stroke="#8B978C" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 58 q-11 2 -13 -6 q11 -1 13 6" fill="#8B978C"/>';
+  } else if (stadio === 1) {
+    pianta = '<path d="M60 80 L60 50" stroke="'+TS+'" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 56 q-13 1 -15 -9 q13 0 15 9" fill="'+T+'"/>' +
+             '<path d="M60 62 q13 1 15 -9 q-13 0 -15 9" fill="'+T+'"/>';
+  } else if (stadio === 2) {
+    pianta = '<path d="M60 80 L60 38" stroke="'+TS+'" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 54 q-17 0 -19 -12 q17 -1 19 12" fill="'+T+'"/>' +
+             '<path d="M60 62 q17 0 19 -12 q-17 -1 -19 12" fill="'+T+'"/>' +
+             '<path d="M60 46 q-13 -2 -13 -13 q13 2 13 13" fill="'+TS+'"/>';
+  } else if (stadio === 3) {
+    pianta = '<path d="M60 80 L60 30" stroke="'+TS+'" stroke-width="6" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 52 q-20 0 -22 -14 q20 -1 22 14" fill="'+T+'"/>' +
+             '<path d="M60 62 q20 0 22 -14 q-20 -1 -22 14" fill="'+T+'"/>' +
+             '<path d="M60 42 q-17 -1 -18 -14 q17 0 18 14" fill="'+TS+'"/>' +
+             '<path d="M60 46 q17 -1 18 -14 q-17 0 -18 14" fill="'+TS+'"/>' +
+             '<circle cx="60" cy="26" r="8" fill="'+F+'"/><circle cx="60" cy="26" r="3.5" fill="#FFF0C4"/>';
+  } else if (stadio === 4) {
+    pianta = '<path d="M60 80 L60 24" stroke="'+TS+'" stroke-width="6.5" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 54 q-23 1 -25 -15 q23 -1 25 15" fill="'+T+'"/>' +
+             '<path d="M60 64 q23 1 25 -15 q-23 -1 -25 15" fill="'+T+'"/>' +
+             '<path d="M60 44 q-20 0 -22 -15 q20 -1 22 15" fill="'+TS+'"/>' +
+             '<path d="M60 50 q20 0 22 -15 q-20 -1 -22 15" fill="'+TS+'"/>' +
+             '<circle cx="60" cy="20" r="9" fill="'+F+'"/>' +
+             '<circle cx="46" cy="28" r="7" fill="'+F+'"/>' +
+             '<circle cx="74" cy="28" r="7" fill="'+F+'"/>' +
+             '<circle cx="60" cy="20" r="3.5" fill="#FFF0C4"/>';
+  } else {
+    pianta = '<path d="M60 80 L60 20" stroke="'+TS+'" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+             '<path d="M60 56 q-26 1 -28 -17 q26 -1 28 17" fill="'+T+'"/>' +
+             '<path d="M60 66 q26 1 28 -17 q-26 -1 -28 17" fill="'+T+'"/>' +
+             '<path d="M60 46 q-23 0 -25 -17 q23 -1 25 17" fill="'+TS+'"/>' +
+             '<path d="M60 52 q23 0 25 -17 q-23 -1 -25 17" fill="'+TS+'"/>' +
+             '<circle cx="60" cy="16" r="10" fill="'+F+'"/>' +
+             '<circle cx="43" cy="25" r="8" fill="'+F+'"/>' +
+             '<circle cx="77" cy="25" r="8" fill="'+F+'"/>' +
+             '<circle cx="50" cy="12" r="6.5" fill="'+FC+'"/>' +
+             '<circle cx="70" cy="12" r="6.5" fill="'+FC+'"/>' +
+             '<circle cx="60" cy="16" r="4" fill="#FFF0C4"/>' +
+             '<circle cx="43" cy="25" r="3" fill="#FFF0C4"/>' +
+             '<circle cx="77" cy="25" r="3" fill="#FFF0C4"/>';
+  }
+  return '<svg viewBox="0 0 120 118" width="94" height="92" aria-hidden="true">' + pianta + V + '</svg>';
+}
+
+const FRASI_PIANTA = [
+  "Il primo germoglio. Continua così e metterà radici.",
+  "Sta mettendo le prime foglie. Bel ritmo.",
+  "Cresce bene: è già una piantina in salute.",
+  "Rigogliosa: il tuo risparmio ha messo radici solide.",
+  "Quasi un albero. Che rigoglio.",
+  "In piena fioritura. Un piccolo tesoro coltivato nel tempo."
+];
+
+/* tracker del risparmio: quattro numeri + grafico mensile */
+function trackerRisparmio(){
+  const anno = annoVistaAnno;
+  const mesi = mesiDi(anno);
+  const inCorsoAnno = anno === oggi.getFullYear();
+  const ultimoChiuso = inCorsoAnno ? oggi.getMonth() - 1 : 11;  /* ultimo mese concluso */
+
+  /* saldi dei mesi conclusi di quest'anno che hanno voci */
+  const chiusi = [];
+  for (let m = 0; m <= ultimoChiuso; m++) if (mesi[m].voci > 0) chiusi.push({ m, saldo: mesi[m].saldo });
+
+  const rispAnnoChiuso = chiusi.reduce((t,x) => t + x.saldo, 0);
+  const media = chiusi.length ? rispAnnoChiuso / chiusi.length : 0;
+  const overall = risparmioCumulato();  /* tutti i mesi chiusi, tutti gli anni */
+
+  /* --- quattro indicatori --- */
+  let html = '<div class="occhiello">Il tuo risparmio</div>';
+  html += '<div class="tracker-griglia">';
+  const ultimoMeseNome = chiusi.length ? MESI[chiusi[chiusi.length-1].m] : "Ultimo mese";
+  const ultimoSaldo = chiusi.length ? chiusi[chiusi.length-1].saldo : 0;
+  html += cellaTracker(ultimoMeseNome, ultimoSaldo, "ultimo mese chiuso");
+  html += cellaTracker("Media mensile", media, "sui mesi chiusi del " + anno);
+  html += cellaTracker("Nel " + anno, rispAnnoChiuso, chiusi.length + (chiusi.length === 1 ? " mese" : " mesi") + " conclusi");
+  html += cellaTracker("Da sempre", overall, "dall'inizio", true);
+  html += '</div>';
+
+  /* nota sul mese in corso (provvisorio) */
+  if (inCorsoAnno) {
+    const haVoci = voci.some(v => delMese(v, oggi.getFullYear(), oggi.getMonth()));
+    if (haVoci) {
+      const provv = risparmioInCorso();
+      const col = provv >= 0 ? "var(--entrata)" : "var(--rosso)";
+      html += '<p class="tracker-corso"><span class="tracker-punto"></span>' +
+              MESI[oggi.getMonth()] + ' in corso: <b style="color:' + col + '">' + fmtT(provv) +
+              '</b> provvisori, si consolidano a fine mese.</p>';
+    }
+  }
+
+  /* --- grafico del risparmio mese per mese --- */
+  const conDati = mesi.some(x => x.voci > 0);
+  if (conDati) {
+    html += '<div class="occhiello">Risparmio mese per mese \u00b7 ' + anno + '</div>';
+    html += '<div class="scheda">' + graficoRisparmioMensile(mesi, ultimoChiuso, inCorsoAnno) + '</div>';
+    html += '<div class="mesi-etichette">' + MESI_BREVI.map(m => "<span>" + m + "</span>").join("") + '</div>';
+  }
+  return html;
+}
+
+function cellaTracker(etichetta, valore, sotto, forte){
+  const col = valore >= 0 ? "var(--entrata)" : "var(--rosso)";
+  return '<div class="tracker-cella' + (forte ? " forte" : "") + '">' +
+    '<span class="tracker-et">' + esc(etichetta) + '</span>' +
+    '<b class="tracker-num" style="color:' + col + '">' + fmtT(valore) + '</b>' +
+    '<em class="tracker-sotto">' + esc(sotto) + '</em></div>';
+}
+
+/* barre verticali del saldo mensile: sopra lo zero verdi, sotto rosse */
+function graficoRisparmioMensile(mesi, ultimoChiuso, inCorsoAnno){
+  const L = 336, H = 150, mid = H/2;
+  const massimo = Math.max(1, ...mesi.map(x => x.voci > 0 ? Math.abs(x.saldo) : 0));
+  const passo = L/12, larg = passo*0.5;
+  let s = '<svg viewBox="0 0 ' + L + ' ' + H + '" width="100%" height="' + H + '" preserveAspectRatio="none" style="display:block">';
+  s += '<line x1="0" y1="' + mid + '" x2="' + L + '" y2="' + mid + '" stroke="var(--bordo)" stroke-width="1.5"/>';
+  mesi.forEach((x, i) => {
+    if (x.voci === 0) return;
+    const provv = inCorsoAnno && i > ultimoChiuso;   /* mese in corso: provvisorio */
+    const h = Math.abs(x.saldo)/massimo * (mid - 10);
+    const cx = i*passo + (passo-larg)/2;
+    const pos = x.saldo >= 0;
+    const y = pos ? mid - h : mid;
+    const col = pos ? "var(--entrata)" : "var(--rosso)";
+    const attr = provv ? ' opacity="0.4"' : '';
+    s += '<rect x="' + cx + '" y="' + y + '" width="' + larg + '" height="' + Math.max(1,h) + '" rx="2" fill="' + col + '"' + attr + '/>';
+  });
+  s += '</svg>';
+  return s;
+}
+
+function kpiCumulato(){
+  /* Tracker del risparmio in cima alla pagina Anno.
+     (La pianta/livelli restano in stand-by finché Fabio non definisce
+     le persone-categoria: il relativo codice qui sotto non viene eseguito.) */
+  return trackerRisparmio();
+
+  const tot = risparmioCumulato();
+  const positivo = tot > 0;
+  const L = livelloDa(tot);
+  const stadio = positivo ? L.attuale.stadio : 0;
+
+  let html = '<div class="kpi-cumulato' + (positivo ? "" : " kpi-rosso") + '">';
+  html += '<div class="kpi-pianta">' + svgPianta(stadio) + '</div>';
+  html += '<div class="kpi-testo">';
+  html += '<span class="kpi-occhiello">Risparmio totale coltivato</span>';
+  html += '<strong class="kpi-cifra">' + fmtT(tot) + '</strong>';
+  if (positivo) {
+    html += '<div class="kpi-livello"><b>' + esc(L.attuale.nome) + '</b></div>';
+  } else {
+    html += '<p class="kpi-frase">Per ora sei in rosso sul totale. Appena risali, spunta il primo germoglio.</p>';
+  }
+  html += '</div></div>';
+
+  /* barra di avanzamento verso il livello successivo */
+  if (positivo) {
+    if (L.prossimo) {
+      html += '<div class="kpi-scala">';
+      html += '<div class="kpi-scala-testa"><span>' + esc(L.attuale.nome) + '</span>' +
+              '<span class="kpi-manca">ancora ' + fmtT(L.manca) + ' \u2192 ' + esc(L.prossimo.nome) + '</span></div>';
+      html += '<div class="kpi-barra"><div class="kpi-barra-riempi" style="width:' + Math.round(L.progresso*100) + '%"></div></div>';
+      html += '<p class="kpi-frase">' + FRASI_PIANTA[stadio] + '</p>';
+      html += provvisorioMese();
+      html += '</div>';
+    } else {
+      html += '<div class="kpi-scala"><div class="kpi-barra"><div class="kpi-barra-riempi" style="width:100%"></div></div>' +
+              '<p class="kpi-frase">Vetta raggiunta: sei in cima alla scala. ' + FRASI_PIANTA[stadio] + '</p>' +
+              provvisorioMese() + '</div>';
+    }
+  } else {
+    html += '<div class="kpi-scala">' + provvisorioMese(true) + '</div>';
+  }
+  return html;
+}
+
+/* riga informativa sul mese in corso: non ancora consolidato */
+function provvisorioMese(sempre){
+  const a = oggi.getFullYear(), m = oggi.getMonth();
+  const haVoci = voci.some(v => delMese(v,a,m));
+  if (!haVoci && !sempre) return "";
+  const val = risparmioInCorso();
+  const colore = val >= 0 ? "#2F6B4F" : "var(--rosso)";
+  return '<div class="kpi-corso">' +
+    '<span class="kpi-corso-punto"></span>' +
+    MESI[m] + ' non è ancora chiuso: <b style="color:' + colore + '">' + fmtT(val) + '</b> provvisori, ' +
+    'entrano nel totale a fine mese.</div>';
+}
+
+function disegnaAnno(){
+  $("#titoloAnno").textContent = annoVistaAnno;
+  const cont = $("#corpoAnno");
+  const p = calcolaProiezione(annoVistaAnno);
+
+  if (!p) {
+    cont.innerHTML = kpiCumulato() +
+                     '<div class="vuoto">Nessuna voce nel ' + annoVistaAnno + '.<br>La proiezione compare appena registri il primo mese.</div>' +
+                     '<button class="bottone-csv" id="csvAnno">Scarica CSV</button>';
+    $("#csvAnno").addEventListener("click", scaricaCsv);
+    return;
+  }
+
+  const totAnn = totaleAnnuali(annoVistaAnno);
+  const rispNetto = p.risparmioAnno - totAnn;
+
+  let html = kpiCumulato();
+  html += '<div class="notte">';
+  html += '<div class="notte-testa"><span>Risparmio ' + annoVistaAnno + ' a fine anno</span></div>';
+  html += '<span class="proiezione-cifra" style="color:' + (rispNetto>=0?"var(--menta-viva)":"var(--rosso-vivo)") + '">' + fmtT(rispNetto) + '</span>';
+  html += '<div class="voci-notte">';
+  html += voceNotte("var(--menta-viva)","Entrate stimate",p.entrateAnno,null);
+  html += voceNotte("#B9C9BF","Uscite stimate",p.usciteAnno,null);
+  if (totAnn > 0) html += voceNotte("#E88A82","Spese annuali (IRPEF, cassa…)",totAnn,null);
+  html += '</div>';
+  html += '<p class="proiezione-nota">Già registrati <b style="color:var(--su-viola)">' + fmtT(p.notoSaldo) + '</b> messi da parte. ' +
+          'Al ritmo attuale metti via il <b style="color:var(--su-viola)">' + Math.round(p.tasso) + '%</b> di quello che entra, ' +
+          fmtT(p.mediaMese) + ' al mese.' +
+          (totAnn > 0 ? ' Il netto sopra è già al netto delle spese annuali.' : '') + '</p>';
+  html += '<div class="interruttore">' +
+          '<button data-modo="lineare" class="' + (p.stagionale?"":"scelto") + '">Ritmo costante</button>' +
+          '<button data-modo="stagionale" class="' + (p.stagionale?"scelto":"") + '"' + (p.distDisponibile?"":" disabled") + '>Come nel ' + (annoVistaAnno-1) + '</button>' +
+          '</div>';
+  html += '<p class="proiezione-nota">' + (p.stagionale
+      ? "I mesi che mancano sono stimati seguendo l'andamento del " + (annoVistaAnno-1) + ": agosto e dicembre pesano come pesavano allora."
+      : (p.distDisponibile ? "I mesi che mancano sono stimati tutti uguali fra loro."
+                           : "Per usare l'andamento del " + (annoVistaAnno-1) + " servono almeno sei mesi registrati in quell'anno.")) + '</p>';
+  html += '</div>';
+
+  html += '<div class="occhiello">Mese per mese</div>';
+  html += '<div class="scheda">' + colonneAnno(p) + '</div>';
+  html += '<div class="mesi-etichette">' + MESI_BREVI.map(m => "<span>" + m + "</span>").join("") + '</div>';
+  html += '<div class="legenda-riga">' +
+          '<span><i style="background:#3D7D9A"></i>Necessità</span>' +
+          '<span><i style="background:#B4823C"></i>Extra</span>' +
+          '<span><i style="background:#2F6B4F;height:4px;border-radius:1px"></i>Entrate</span>' +
+          '<span><i style="background:#B9C9BF"></i>Stima</span></div>';
+
+  /* tabella con i valori */
+  html += '<div class="occhiello">I numeri, mese per mese</div>';
+  html += '<table class="conti"><thead><tr><th>Mese</th><th>Entrate</th><th>Uscite</th><th>Saldo</th></tr></thead><tbody>';
+  p.righe.forEach(r => {
+    const cl = r.parziale ? "corrente" : (r.reale ? "" : "stima");
+    html += '<tr class="' + cl + '"><td>' + MESI_BREVI[r.mese] + (r.parziale ? " ·" : "") + '</td>' +
+            '<td>' + num(Math.round(r.entrate)) + '</td>' +
+            '<td>' + num(Math.round(r.uscite)) + '</td>' +
+            '<td style="color:' + (r.saldo>=0?"var(--entrata)":"var(--rosso)") + '">' + num(Math.round(r.saldo)) + '</td></tr>';
+  });
+  html += '<tr class="totale"><td>Anno</td><td>' + num(Math.round(p.entrateAnno)) + '</td><td>' + num(Math.round(p.usciteAnno)) +
+          '</td><td style="color:' + (p.risparmioAnno>=0?"var(--entrata)":"var(--rosso)") + '">' + num(Math.round(p.risparmioAnno)) + '</td></tr>';
+  html += '</tbody></table>';
+  html += '<p style="font-size:12.5px;line-height:1.55;color:var(--inchiostro-lieve);margin:10px 0 0">' +
+          'In corsivo i mesi stimati. Il mese segnato con · è quello in corso: contiene il registrato più la stima dei giorni che restano. Importi in euro.</p>';
+
+  /* ripartizione dell'anno */
+  const necTot = p.mesi.reduce((t,m) => t + m.nec, 0);
+  const extTot = p.mesi.reduce((t,m) => t + m.extra, 0);
+  const usTot = necTot + extTot;
+  if (usTot > 0) {
+    html += '<div class="occhiello">Uscite registrate nel ' + annoVistaAnno + '</div>';
+    html += '<div class="scheda">';
+    html += '<div class="voce-cat"><div class="voce-cat-testa"><span>Necessità</span><b>' + fmt(necTot) + '<small>' + perc(necTot,usTot) + '%</small></b></div>' +
+            '<div class="traccia"><div style="width:' + (necTot/usTot*100) + '%;background:linear-gradient(90deg,#5FA3C0,#3D7D9A)"></div></div></div>';
+    html += '<div class="voce-cat" style="margin-bottom:0"><div class="voce-cat-testa"><span>Extra</span><b>' + fmt(extTot) + '<small>' + perc(extTot,usTot) + '%</small></b></div>' +
+            '<div class="traccia"><div style="width:' + (extTot/usTot*100) + '%;background:linear-gradient(90deg,#D6A65C,#B4823C)"></div></div></div>';
+    html += '</div>';
+
+    /* categorie dell'anno */
+    const perCat = {};
+    voci.filter(v => delAnno(v, annoVistaAnno) && v.tipo !== "entrata").forEach(v => {
+      const k = v.tipo + "|" + v.cat;
+      perCat[k] = (perCat[k] || 0) + v.importo;
+    });
+    const ordinate = Object.entries(perCat).sort((a,b) => b[1] - a[1]).slice(0,8);
+    const massimo = ordinate[0][1];
+    html += '<div class="occhiello">Dove va di più</div>';
+    ordinate.forEach(([k, tot]) => {
+      const [tipo, cat] = k.split("|");
+      html += '<div class="voce-cat"><div class="voce-cat-testa"><span>' + esc(cat) + '</span>' +
+              '<b>' + fmt(tot) + '<small>' + perc(tot,usTot) + '%</small></b></div>' +
+              '<div class="traccia"><div style="width:' + (tot/massimo*100) + '%;background:linear-gradient(90deg,' +
+              GRUPPI[tipo].viva + ',' + GRUPPI[tipo].colore + ')"></div></div></div>';
+    });
+  }
+
+  html += bloccoAnnuali(annoVistaAnno);
+  html += '<button class="bottone-csv" id="csvAnno">Scarica CSV</button>';
+  cont.innerHTML = html;
+
+  cont.querySelectorAll(".interruttore button").forEach(b => b.addEventListener("click", async () => {
+    if (b.disabled) return;
+    modoProiezione = b.dataset.modo;
+    await Deposito.scrivi(CHIAVE_MODO, modoProiezione);
+    disegnaAnno();
+  }));
+  agganciaAnnuali();
+  $("#csvAnno").addEventListener("click", scaricaCsv);
+}
+
+/* --- blocco spese annuali corpose --- */
+function bloccoAnnuali(anno){
+  const lista = annualiDi(anno);
+  const tot = totaleAnnuali(anno);
+  let html = '<div class="occhiello">Spese annuali corpose · ' + anno + '</div>';
+  html += '<p style="font-size:13px;line-height:1.5;color:var(--inchiostro-lieve);margin:0 0 12px">' +
+          'IRPEF, cassa previdenziale e simili: le grosse uscite che arrivano una volta l\'anno. ' +
+          'Vengono tolte in anticipo dal risparmio proiettato, così non ti coglie di sorpresa.</p>';
+  html += '<div class="scheda">';
+  if (lista.length) {
+    lista.forEach(x => {
+      html += '<div class="annuale-riga"><div class="annuale-info">' +
+        '<strong>' + esc(x.nome) + '</strong>' +
+        (x.mese != null ? '<em>attesa a ' + MESI[x.mese].toLowerCase() + '</em>' : '<em>durante l\'anno</em>') +
+        '</div><span class="annuale-imp">− ' + fmtT(x.importo) + '</span>' +
+        '<button class="annuale-x" data-del="' + x.id + '" aria-label="Elimina">×</button></div>';
+    });
+    html += '<div class="annuale-riga" style="border-bottom:0"><div class="annuale-info"><strong>Totale annuale</strong></div>' +
+            '<span class="annuale-imp">− ' + fmtT(tot) + '</span><span style="width:32px"></span></div>';
+  } else {
+    html += '<p style="margin:0 0 14px;font-size:14px;color:var(--inchiostro-lieve)">Nessuna spesa annuale per il ' + anno + '.</p>';
+  }
+  html += '<div class="form-annuale">' +
+    '<input type="text" id="annNome" placeholder="Nome (es. IRPEF, cassa)" autocomplete="off">' +
+    '<div class="riga2">' +
+      '<input class="imp" type="text" id="annImp" inputmode="decimal" placeholder="Importo €" autocomplete="off">' +
+      '<select class="mese" id="annMese"><option value="">Mese (facolt.)</option>' +
+        MESI.map((nm,i) => '<option value="' + i + '">' + nm + '</option>').join("") +
+      '</select>' +
+    '</div>' +
+    '<button class="salva" id="annAgg" style="border-radius:999px">Aggiungi spesa annuale</button>' +
+    '</div>';
+  html += '</div>';
+  return html;
+}
+
+function agganciaAnnuali(){
+  const agg = $("#annAgg"); if (agg) agg.addEventListener("click", aggiungiAnnuale);
+  document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => eliminaAnnuale(b.dataset.del)));
+}
+
+async function aggiungiAnnuale(){
+  const nome = ($("#annNome").value || "").trim();
+  const imp = leggiEuro($("#annImp").value);
+  const meseSel = $("#annMese").value;
+  if (!nome || imp <= 0) { avvisa("Servono nome e importo"); return; }
+  annuali.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+    anno: annoVistaAnno, nome, importo: Math.round(imp*100)/100,
+    mese: meseSel === "" ? null : +meseSel
+  });
+  await Deposito.scrivi(CHIAVE_ANNUALI, annuali);
+  disegnaAnno();
+  avvisa("Spesa annuale aggiunta");
+}
+
+async function eliminaAnnuale(id){
+  annuali = annuali.filter(x => x.id !== id);
+  await Deposito.scrivi(CHIAVE_ANNUALI, annuali);
+  disegnaAnno();
+  avvisa("Rimossa");
+}
+
+function colonneAnno(p){
+  const L = 336, H = 158, base = H - 12;
+  const massimo = Math.max(1, ...p.righe.map(r => Math.max(r.uscite, r.entrate)));
+  const passo = L / 12, larg = passo * 0.54;
+  let s = '<svg viewBox="0 0 ' + L + ' ' + H + '" width="100%" height="' + H + '" preserveAspectRatio="none" style="display:block">';
+  s += '<line x1="0" y1="' + base + '" x2="' + L + '" y2="' + base + '" stroke="#E2DDD0" stroke-width="1"/>';
+  p.righe.forEach((r, i) => {
+    const x = i * passo + (passo - larg) / 2;
+    const stima = !r.reale && !r.parziale;
+    const utile = base - 10;
+    if (stima) {
+      const h = r.uscite / massimo * utile;
+      if (h > 0) s += '<rect x="' + x + '" y="' + (base - h) + '" width="' + larg + '" height="' + h + '" fill="#B9C9BF" opacity=".55"/>';
+    } else {
+      const hN = r.nec / massimo * utile, hX = r.extraSp / massimo * utile;
+      if (hN > 0) s += '<rect x="' + x + '" y="' + (base - hN) + '" width="' + larg + '" height="' + hN + '" fill="#3D7D9A"/>';
+      if (hX > 0) s += '<rect x="' + x + '" y="' + (base - hN - hX) + '" width="' + larg + '" height="' + hX + '" fill="#B4823C"/>';
+      if (r.parziale) {
+        const hRest = (r.uscite - r.nec - r.extraSp) / massimo * utile;
+        if (hRest > 0) s += '<rect x="' + x + '" y="' + (base - hN - hX - hRest) + '" width="' + larg + '" height="' + hRest + '" fill="#B9C9BF" opacity=".55"/>';
+      }
+    }
+    if (r.entrate > 0) {
+      const y = base - r.entrate / massimo * utile;
+      s += '<rect x="' + (x - 2.5) + '" y="' + (y - 1.5) + '" width="' + (larg + 5) + '" height="3" fill="#2F6B4F" opacity="' + (stima ? ".45" : "1") + '"/>';
+    }
+  });
+  s += '</svg>';
+  return s;
+}
+
+/* ============================================================
+   6-bis. Budget: schermata
+   ============================================================ */
+function disegnaBudget(){
+  $("#titoloBudget").textContent = MESI[budgetMese] + " " + budgetAnno;
+  const cont = $("#corpoBudget");
+  const chiave = chiaveMese(budgetAnno, budgetMese);
+  const q = quadroBudget(budgetAnno, budgetMese);
+  const impostatoQui = !!budget[chiave];
+
+  let html = "";
+
+  /* --- riquadro riepilogo in cima --- */
+  html += '<div class="notte">';
+  html += '<div class="notte-testa"><span>Budget del mese</span>' +
+          (q.esiste && q.ereditato ? '<span class="notte-cifra" style="color:var(--su-viola-lieve)">da ' + etichettaMese(q.da) + '</span>' : '') + '</div>';
+  html += '<span class="proiezione-cifra" style="color:var(--su-viola)">' + fmtT(q.limiteTot) + '</span>';
+  html += '<div class="voci-notte">';
+  html += voceNotte("var(--menta-viva)","Entrate del mese", q.ent.valore, null);
+  html += voceNotte("#B9C9BF","Risparmio se resti nel budget", q.risparmioAtteso, null);
+  html += '</div>';
+  html += '<p class="proiezione-nota">' + (q.ent.stimata
+      ? "Entrate stimate dalla media dei mesi passati. "
+      : "") + "Scrivi qui sotto quanto vuoi destinare a ogni voce. Vale da " + MESI[budgetMese].toLowerCase() +
+      " in poi, finché non cambi." + '</p>';
+  html += '</div>';
+
+  /* --- impostazione limiti in euro, raggruppati --- */
+  CHIAVE_BUDGET_GRUPPI.forEach(g => {
+    const righeG = q.righe.filter(r => r.gruppo === g);
+    const totG = righeG.reduce((t,r) => t + r.limite, 0);
+    html += '<div class="occhiello">' + GRUPPI[g].nome + ' · ' + fmtT(totG) + '</div>';
+    html += '<div class="scheda">';
+    righeG.forEach((r, i) => {
+      html += '<div class="riga-lim' + (i === righeG.length-1 ? " ultima" : "") + '">' +
+        '<span class="lim-nome"><i style="background:' + r.colore + '"></i>' + esc(r.nome) + '</span>' +
+        '<span class="lim-pct">' + (r.limite > 0 ? r.pct + "%" : "") + '</span>' +
+        '<span class="lim-campo"><b>€</b><input type="text" inputmode="decimal" data-id="' + r.id + '" value="' + (r.limite > 0 ? Math.round(r.limite) : "") + '" placeholder="0"></span>' +
+        '</div>';
+    });
+    html += '</div>';
+  });
+  html += '<button class="bottone-csv" id="salvaLimiti" style="margin-top:16px">Salva budget</button>';
+
+  /* --- confronto budget vs speso --- */
+  const conBudget = q.righe.filter(r => r.limite > 0 || r.speso > 0);
+  if (conBudget.length) {
+    html += '<div class="occhiello">Budget e speso · ' + MESI_BREVI[budgetMese] + '</div>';
+    conBudget.forEach(r => {
+      const quota = r.limite > 0 ? Math.min(100, r.speso / r.limite * 100) : 100;
+      const colBarra = r.limite <= 0 ? "var(--inchiostro-lieve)" : r.stato === "sforato" ? "var(--rosso)" : r.stato === "quasi" ? "#B4823C" : "var(--entrata)";
+      html += '<div class="voce-cat"><div class="voce-cat-testa">' +
+        '<span>' + esc(r.nome) + '</span>' +
+        '<b>' + fmt(r.speso) + '<small>' + (r.limite > 0 ? "/ " + fmtT(r.limite) : "· fuori budget") + '</small></b></div>' +
+        '<div class="traccia"><div style="width:' + quota + '%;background:' + colBarra + '"></div></div>';
+      if (r.stato === "sforato") html += '<div class="cat-nota sforato">Sforato di ' + fmt(-r.resto) + '</div>';
+      else if (r.stato === "quasi") html += '<div class="cat-nota quasi">Restano ' + fmt(r.resto) + '</div>';
+      html += '</div>';
+    });
+
+    const totColore = q.spesoTot > q.limiteTot ? "var(--rosso)" : "var(--entrata)";
+    html += '<div class="sintesi" style="margin-top:18px">' +
+      '<div class="cella"><span>Budget</span><b>' + fmtT(q.limiteTot) + '</b></div>' +
+      '<div class="cella"><span>Speso</span><b>' + fmtT(q.spesoTot) + '</b></div>' +
+      '<div class="cella"><span>Resta</span><b style="color:' + totColore + '">' + fmtT(q.limiteTot - q.spesoTot) + '</b></div>' +
+      '</div>';
+  }
+
+  if (impostatoQui)
+    html += '<button class="bottone-csv" id="rimuoviBudget" style="margin-top:20px;border-color:var(--rosso);color:var(--rosso)">Rimuovi budget di questo mese</button>';
+
+  cont.innerHTML = html;
+  agganciaBudget();
+}
+
+function etichettaMese(chiave){
+  const p = chiave.split("-");
+  return MESI_BREVI[+p[1]-1] + " " + p[0];
+}
+
+function leggiEuro(str){
+  const g = (str || "").replace(/\s/g,"").replace(/\./g,"").replace(",",".");
+  const n = parseFloat(g);
+  return isFinite(n) ? Math.abs(n) : 0;
+}
+
+/* aggiorna le sole percentuali accanto ai campi, senza ridisegnare tutto */
+function aggiornaPct(){
+  const campi = [...document.querySelectorAll('.lim-campo input')];
+  let tot = 0;
+  const valori = campi.map(inp => { const v = leggiEuro(inp.value); tot += v; return v; });
+  campi.forEach((inp, i) => {
+    const pctEl = inp.closest(".riga-lim").querySelector(".lim-pct");
+    pctEl.textContent = (valori[i] > 0 && tot > 0) ? Math.round(valori[i]/tot*100) + "%" : "";
+  });
+}
+
+async function salvaLimiti(){
+  const chiave = chiaveMese(budgetAnno, budgetMese);
+  const limiti = {};
+  document.querySelectorAll('.lim-campo input').forEach(inp => {
+    const v = leggiEuro(inp.value);
+    if (v > 0) limiti[inp.dataset.id] = Math.round(v);
+  });
+  budget[chiave] = { limiti };
+  await Deposito.scrivi(CHIAVE_BUDGET, budget);
+  disegnaBudget();
+  avvisa("Budget salvato");
+}
+
+async function rimuoviBudget(){
+  const chiave = chiaveMese(budgetAnno, budgetMese);
+  if (!budget[chiave]) return;
+  if (!confirm("Rimuovere il budget di " + MESI[budgetMese] + "? Il mese tornerà a seguire quello precedente.")) return;
+  delete budget[chiave];
+  await Deposito.scrivi(CHIAVE_BUDGET, budget);
+  disegnaBudget();
+  avvisa("Budget rimosso");
+}
+
+function agganciaBudget(){
+  document.querySelectorAll('.lim-campo input').forEach(inp => inp.addEventListener("input", aggiornaPct));
+  const s = $("#salvaLimiti"); if (s) s.addEventListener("click", salvaLimiti);
+  const r = $("#rimuoviBudget"); if (r) r.addEventListener("click", rimuoviBudget);
+}
+
+/* pop-up modale centrale, per gli avvisi importanti */
+function popup(testo, livello){
+  const vecchio = $("#modale"); if (vecchio) vecchio.remove();
+  const d = document.createElement("div");
+  d.className = "modale-velo";
+  d.id = "modale";
+  const emoji = livello === "sforato" ? "\uD83C\uDF10" : "\u26A1";
+  d.innerHTML = '<div class="modale-carta modale-' + livello + '">' +
+    '<div class="modale-emoji">' + emoji + '</div>' +
+    '<p>' + esc(testo) + '</p>' +
+    '<button class="modale-ok">Ho capito</button></div>';
+  document.body.appendChild(d);
+  const chiudi = () => d.remove();
+  d.querySelector(".modale-ok").addEventListener("click", chiudi);
+  d.addEventListener("click", e => { if (e.target === d) chiudi(); });
+}
+
+/* ============================================================
+   7. Navigazione
+   ============================================================ */
+function cambiaVista(nome){
+  document.querySelectorAll(".vista").forEach(v => v.classList.toggle("attiva", v.id === "vista-" + nome));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("attivo", t.dataset.vista === nome));
+  if (nome === "mese") disegnaMese();
+  if (nome === "budget") disegnaBudget();
+  if (nome === "anno") disegnaAnno();
+}
+
+/* ============================================================
+   8. CSV
+   ============================================================ */
+function versoCsv(){
+  const testa = ["data","tipo","categoria","titolo","note","importo"];
+  const cella = t => '"' + String(t == null ? "" : t).replace(/"/g,'""') + '"';
+  const righe = voci.slice().sort((a,b) => a.data.localeCompare(b.data))
+    .map(v => [v.data, v.tipo, v.cat, v.titolo, v.note, v.importo.toFixed(2)].map(cella).join(","));
+  return testa.join(",") + "\n" + righe.join("\n");
+}
+function scaricaCsv(){
+  if (!voci.length) { avvisa("Non c'è ancora niente da scaricare"); return; }
+  const blob = new Blob(["\uFEFF" + versoCsv()], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "conti-" + isoOggi() + ".csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  avvisa("CSV pronto");
+}
+function dividiRiga(riga){
+  const out = []; let cur = "", tra = false;
+  for (let i = 0; i < riga.length; i++) {
+    const c = riga[i];
+    if (tra) {
+      if (c === '"' && riga[i+1] === '"') { cur += '"'; i++; }
+      else if (c === '"') tra = false;
+      else cur += c;
+    } else {
+      if (c === '"') tra = true;
+      else if (c === ",") { out.push(cur); cur = ""; }
+      else cur += c;
+    }
+  }
+  out.push(cur); return out;
+}
+async function leggiCsv(file){
+  const testo = (await file.text()).replace(/^\uFEFF/, "");
+  const righe = testo.split(/\r?\n/).filter(r => r.trim());
+  let aggiunte = 0;
+  righe.slice(1).forEach(r => {
+    const c = dividiRiga(r);
+    if (c.length < 6) return;
+    const imp = parseFloat(String(c[5]).replace(",", "."));
+    if (!isFinite(imp) || !/^\d{4}-\d{2}-\d{2}$/.test(c[0]) || !GRUPPI[c[1]]) return;
+    voci.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      data: c[0], tipo: c[1], cat: c[2], titolo: c[3] || c[2], note: c[4], importo: Math.abs(imp)
+    });
+    aggiunte++;
+  });
+  await Deposito.scrivi(CHIAVE, voci);
+  disegnaMese(); disegnaAnno(); aggiornaConta();
+  avvisa(aggiunte ? aggiunte + " voci importate" : "Nessuna voce riconosciuta nel file");
+}
+function aggiornaConta(){
+  $("#contaVoci").textContent = voci.length ? voci.length + " voci registrate" : "Ancora nessuna voce";
+}
+function apriPannello(aperto){
+  $("#velo").classList.toggle("aperto", aperto);
+  $("#pannello").classList.toggle("aperto", aperto);
+  if (aperto) aggiornaConta();
+}
+
+/* ============================================================
+   9. Avvio
+   ============================================================ */
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => cambiaVista(t.dataset.vista)));
+document.querySelectorAll(".segmento").forEach(s => s.addEventListener("click", () => scegliTipo(s.dataset.tipo)));
+$("#importo").addEventListener("input", controllaModulo);
+$("#salva").addEventListener("click", salvaVoce);
+$("#eliminaVoce").addEventListener("click", eliminaCorrente);
+$("#mesePrec").addEventListener("click", () => { meseVista--; if (meseVista < 0) { meseVista = 11; annoVista--; } disegnaMese(); });
+$("#meseSucc").addEventListener("click", () => { meseVista++; if (meseVista > 11) { meseVista = 0; annoVista++; } disegnaMese(); });
+$("#annoPrec").addEventListener("click", () => { annoVistaAnno--; disegnaAnno(); });
+$("#annoSucc").addEventListener("click", () => { annoVistaAnno++; disegnaAnno(); });
+$("#budgetPrec").addEventListener("click", () => { budgetMese--; if (budgetMese < 0) { budgetMese = 11; budgetAnno--; } disegnaBudget(); });
+$("#budgetSucc").addEventListener("click", () => { budgetMese++; if (budgetMese > 11) { budgetMese = 0; budgetAnno++; } disegnaBudget(); });
+$("#apriDati").addEventListener("click", () => apriPannello(true));
+$("#chiudiPannello").addEventListener("click", () => apriPannello(false));
+$("#velo").addEventListener("click", () => apriPannello(false));
+$("#esporta").addEventListener("click", scaricaCsv);
+$("#importa").addEventListener("click", () => $("#fileCsv").click());
+$("#fileCsv").addEventListener("change", e => { if (e.target.files[0]) leggiCsv(e.target.files[0]); e.target.value = ""; });
+$("#azzera").addEventListener("click", async () => {
+  if (!confirm("Cancellare tutte le voci? Scarica prima il CSV se ti servono.")) return;
+  voci = [];
+  await Deposito.scrivi(CHIAVE, voci);
+  disegnaMese(); disegnaAnno(); aggiornaConta(); apriPannello(false);
+  avvisa("Tutto cancellato");
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+(async function avvio(){
+  voci = await Deposito.leggi(CHIAVE, []);
+  modoProiezione = await Deposito.leggi(CHIAVE_MODO, "stagionale");
+  budget = await Deposito.leggi(CHIAVE_BUDGET, {}) || {};
+  annuali = await Deposito.leggi(CHIAVE_ANNUALI, []) || [];
+  azzeraModulo(); controllaModulo(); disegnaMese(); disegnaAnno();
+})();
+</script>
+</body>
+</html>
